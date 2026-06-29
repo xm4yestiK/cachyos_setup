@@ -88,13 +88,14 @@ EOF
 
 mkdir -p ~/.config/fish
 # Menambahkan trigger Hyprland otomatis saat TTY1 login
-if ! grep -q "exec Hyprland" ~/.config/fish/config.fish 2>/dev/null; then
+if ! grep -q "Hyprland" ~/.config/fish/config.fish 2>/dev/null; then
     cat << 'EOF' >> ~/.config/fish/config.fish
 
 # Autostart Wayland (Hyprland) via TTY
 if status is-login
     if test -z "$DISPLAY" -a "$XDG_VTNR" = 1
-        exec Hyprland
+        # Menghapus 'exec' agar user memiliki fallback aman (ke terminal) jika Hyprland crash!
+        Hyprland
     end
 end
 EOF
@@ -128,20 +129,24 @@ configuration {
     show-icons: true;
     font: "JetBrainsMono Nerd Font 12";
 }
-@theme "Arc-Dark"
+/* Hapus @theme Arc-Dark karena rawan crash jika tema tidak terinstal */
 EOF
 
 mkdir -p ~/.config/hypr
 [ -f ~/.config/hypr/hyprland.conf ] && cp ~/.config/hypr/hyprland.conf ~/.config/hypr/hyprland.conf.bak || true
 cat << 'EOF' > ~/.config/hypr/hyprland.conf
-monitor=,preferred,auto,1
+# Auto-scale monitor cerdas (mencegah GUI hancur di monitor 4K/HiDPI)
+monitor=,preferred,auto,auto
 
 # Autostart Daemons & Integrasi Portal Wayland
 exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
-exec-once = /usr/lib/polkit-kde-authentication-agent-1
+# Jeda 1 detik pada polkit untuk mencegah Race Condition GUI Password
+exec-once = sleep 1 && /usr/lib/polkit-kde-authentication-agent-1
 exec-once = swaybg -c "#282a36"
 exec-once = waybar
-exec-once = nm-applet --indicator & blueman-applet
+# Pemisahan proses background untuk mencegah zombie process di Hyprland
+exec-once = nm-applet --indicator
+exec-once = blueman-applet
 exec-once = nwg-dock-hyprland -d -x -p bottom -l top
 exec-once = hypridle
 exec-once = wl-paste --type text --watch wl-copy
@@ -151,6 +156,7 @@ input {
     touchpad {
         natural_scroll = true
         tap-to-click = true
+        disable_while_typing = true
     }
 }
 general {
