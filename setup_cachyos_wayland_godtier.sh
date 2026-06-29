@@ -133,7 +133,10 @@ cat << 'EOF' > ~/.config/waybar/config
     "modules-center": ["clock"],
     "modules-right": ["tray", "network", "pulseaudio", "battery"],
     "hyprland/workspaces": { "format": "{icon}", "on-click": "activate" },
-    "clock": { "format": "{:%H:%M - %d %b}" }
+    "clock": { "format": "{:%H:%M - %d %b}" },
+    "network": { "format-wifi": "  {essid}", "format-ethernet": "  {ipaddr}", "format-disconnected": "⚠ Disconnected" },
+    "battery": { "states": { "warning": 30, "critical": 15 }, "format": "{icon}  {capacity}%", "format-icons": ["", "", "", "", ""] },
+    "pulseaudio": { "format": "{icon}  {volume}%", "format-muted": " Muted", "format-icons": { "default": ["", "", ""] } }
 }
 EOF
 
@@ -161,7 +164,7 @@ env = XCURSOR_THEME,Adwaita
 # Autostart Daemons & Integrasi Portal Wayland
 exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 # Menggunakan agen polkit native Hyprland standar 2026
-exec-once = systemctl --user start hyprpolkitagent
+exec-once = /usr/lib/hyprpolkitagent
 exec-once = swaybg -c "#282a36"
 exec-once = waybar
 # Pemisahan proses background untuk mencegah zombie process di Hyprland
@@ -391,6 +394,7 @@ echo "[8/20] Kernel Sysctl (Latensi Nol & TCP BBRv3)..."
 sudo mkdir -p /etc/sysctl.d
 cat <<EOF | sudo tee /etc/sysctl.d/99-cachyos-godtier.conf
 vm.swappiness=150
+vm.page-cluster=0
 vm.watermark_boost_factor=20000
 vm.watermark_scale_factor=250
 net.ipv4.tcp_congestion_control=bbr
@@ -444,6 +448,7 @@ sudo mkdir -p /etc/profile.d
 cat <<EOF | sudo tee /etc/profile.d/wayland-godtier.sh
 export MESA_NO_ERROR=1
 export MOZ_ENABLE_WAYLAND=1
+export LIBVA_DRIVER_NAME=iHD
 export QT_QPA_PLATFORM="wayland;xcb"
 export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 export QT_STYLE_OVERRIDE=kvantum
@@ -476,15 +481,16 @@ echo ""
 echo "[15/20] Membangun Modul Shutdown Cleanup..."
 sudo mkdir -p /usr/local/bin
 cat <<'EOF' | sudo tee /usr/local/bin/shutdown-cleanup.sh
-#!/usr/bin/env bash
-if pacman -Qtdq > /dev/null 2>&1; then
-    pacman -Rns $(pacman -Qtdq) --noconfirm || true
-fi
-pacman -Sc --noconfirm || true
-paccache -rk2 || true
-rm -rf /home/*/.cache/* || true
-journalctl --vacuum-size=100M || true
-sync
+#!/bin/bash
+# Hapus cache pacman (sisakan 2 versi terakhir)
+paccache -r -k2 || true
+# Hapus cache AUR (Yay/Paru) yang menumpuk gila-gilaan
+rm -rf /home/*/.cache/yay/* /home/*/.cache/paru/* 2>/dev/null || true
+# Hapus paket yatim piatu (orphans)
+pacman -Rns $(pacman -Qtdq) --noconfirm 2>/dev/null || true
+# Bersihkan log systemd yang lebih tua dari 3 hari
+journalctl --vacuum-time=3d || true
+# Eksekusi TRIM pada SSD
 fstrim -av || true
 EOF
 sudo chmod +x /usr/local/bin/shutdown-cleanup.sh
@@ -543,6 +549,8 @@ sudo systemctl enable --now auto-cpufreq.service || true
 sudo systemctl enable shutdown-cleanup.service || true
 sudo systemctl enable systemd-tmpfiles-setup.service || true
 sudo systemctl enable --now bluetooth.service || true
+sudo sed -i 's/^#AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf || true
+sudo sed -i 's/^#AutoEnable=true/AutoEnable=true/' /etc/bluetooth/main.conf || true
 sudo timedatectl set-ntp true || true
 
 if [ -f /etc/default/scx ]; then
