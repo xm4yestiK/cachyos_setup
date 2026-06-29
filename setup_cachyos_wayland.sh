@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 
 # ========================================================================
-# Script Personalisasi & Optimasi "WAYLAND GOD-TIER" (HYPRLAND)
-# Dibuat khusus: OS CachyOS x86_64 | DYNAMIC AUTO-DETECT (INTEL & AMD)
+# WAYLAND OPTIMIZATION & PERSONALIZATION SCRIPT (HYPRLAND)
+# Built specifically for: CachyOS x86_64 | DYNAMIC AUTO-DETECT (INTEL & AMD)
 #
-# PANDUAN INSTALASI CACHYOS (Calamares):
-# 1. Pilih opsi "No Desktop Environment" (CLI) jika tersedia.
-# 2. Jika wajib memilih DE, pilih "Hyprland" atau "Sway".
-# 3. JANGAN PERNAH memilih LXQt, XFCE, atau Openbox (X11 Bloat).
+# CACHYOS INSTALLATION GUIDE (Calamares):
+# 1. Select the "No Desktop Environment" (CLI) option if available.
+# 2. If forced to choose a DE, select "Hyprland" or "Sway".
+# 3. NEVER choose LXQt, XFCE, or Openbox (X11 Bloat).
 # 
-# [FITUR UTAMA SCRIPT INI]:
-# - Migrasi total dari X11 (Openbox) ke WAYLAND murni (Hyprland).
-# - Tanpa SDDM (TTY Autologin langsung tembus ke Hyprland).
-# - Waybar + nwg-dock sebagai panel & dock modern tanpa komposisi pihak ketiga.
-# - Proteksi Root, Auto-backup, Hardware Intelijen, Gecko Tuning, Smart-power.
+# [CORE FEATURES]:
+# - Full migration from X11 (Openbox) to pure WAYLAND (Hyprland).
+# - No SDDM (TTY Autologin goes straight into Hyprland).
+# - Waybar + nwg-dock as modern panel & dock without third-party compositors.
+# - Root Protection, Auto-backup, Hardware Intelligence, Gecko Tuning, Smart-power.
 # ========================================================================
 
 set -e
 
 if [ "$EUID" -eq 0 ]; then
   echo "================================================================="
-  echo "[-] FATAL ERROR: JANGAN JALANKAN SCRIPT INI DENGAN 'SUDO' ATAU ROOT!"
-  echo "    Script ini dirancang untuk dijalankan sebagai User Biasa."
-  echo "    Silakan jalankan ulang tanpa 'sudo'."
+  echo "[-] FATAL ERROR: DO NOT RUN THIS SCRIPT WITH 'SUDO' OR ROOT!"
+  echo "    This script is designed to be run as a Standard User."
+  echo "    Please run it again without 'sudo'."
   echo "================================================================="
   exit 1
 fi
@@ -30,32 +30,32 @@ fi
 USER_NAME=$(whoami)
 
 echo "================================================================="
-echo "Memulai injeksi performa WAYLAND GOD-TIER CachyOS (Juni 2026)..."
+echo "Starting WAYLAND CachyOS Performance Injection (June 2026)..."
 echo "                      by m4yestiK"
 echo "================================================================="
 
 # ========================================================================
-# AUTO-DETEKSI HARDWARE (CPU & GPU)
+# HARDWARE AUTO-DETECTION (CPU & GPU)
 # ========================================================================
-echo ">> [PROSES] Mendeteksi Vendor CPU..."
+echo ">> [PROCESS] Detecting CPU Vendor..."
 CPU_VENDOR=$(grep -m 1 'vendor_id' /proc/cpuinfo | awk '{print $3}' || true)
 GPU_VENDOR="unknown"
 
-echo ">> [PROSES] Mendeteksi Vendor GPU (VGA/3D)..."
+echo ">> [PROCESS] Detecting GPU Vendor (VGA/3D)..."
 if lspci -nn | grep -i 'vga\|3d\|display' | grep -iq 'intel'; then
     GPU_VENDOR="intel"
 elif lspci -nn | grep -i 'vga\|3d\|display' | grep -iq 'amd\|radeon'; then
     GPU_VENDOR="amd"
 fi
 
-echo ">> HASIL DETEKSI CPU: $CPU_VENDOR"
-echo ">> HASIL DETEKSI GPU: $GPU_VENDOR"
+echo ">> DETECTED CPU: $CPU_VENDOR"
+echo ">> DETECTED GPU: $GPU_VENDOR"
 echo "================================================================="
 
-# 1. Update & Instalasi Wayland Stack
+# 1. Update & Install Wayland Stack
 echo ""
-echo "[1/20] Instalasi Ekosistem Wayland + Paket Tuning..."
-# Mengamankan PGP Keyring dari kegagalan sinkronisasi fresh install
+echo "[1/20] Installing Wayland Ecosystem + Tuning Packages..."
+# Securing PGP Keyring from fresh install sync failures
 sudo pacman -Sy --noconfirm archlinux-keyring cachyos-keyring || true
 sudo pacman -Syu --noconfirm --needed \
     fish hyprland waybar swaybg rofi-wayland mako hyprpolkitagent \
@@ -65,11 +65,11 @@ sudo pacman -Syu --noconfirm --needed \
     network-manager-applet blueman bluez bluez-utils brightnessctl \
     fprintd pavucontrol qt5-wayland qt6-wayland hyprlock hypridle wl-clipboard cliphist grim slurp xdg-user-dirs
 
-# Mengamankan Struktur Direktori dan Font Cache
+# Securing Directory Structure and Font Cache
 xdg-user-dirs-update || true
 fc-cache -fv >/dev/null 2>&1 || true
 
-# Cek nwg-dock-hyprland (Khas CachyOS/AUR Fallback)
+# Check for nwg-dock-hyprland (CachyOS/AUR Fallback)
 if pacman -Ss nwg-dock-hyprland >/dev/null; then
     sudo pacman -S --noconfirm --needed nwg-dock-hyprland || true
 elif command -v paru >/dev/null; then
@@ -82,15 +82,15 @@ fi
 
 # 2. Setup Shell & Locale
 echo ""
-echo "[2/20] Setup Shell & Locale..."
+echo "[2/20] Setting up Shell & Locale..."
 [ "$SHELL" != "/usr/bin/fish" ] && chsh -s /usr/bin/fish || true
 sudo sed -i 's/^#id_ID.UTF-8 UTF-8/id_ID.UTF-8 UTF-8/' /etc/locale.gen || true
 sudo locale-gen >/dev/null 2>&1 || true
 sudo localectl set-locale LANG=id_ID.UTF-8 || true
 
-# 3. TTY Autologin (Membunuh SDDM)
+# 3. TTY Autologin (Killing SDDM)
 echo ""
-echo "[3/20] Meruntuhkan SDDM & Membangun TTY Autologin..."
+echo "[3/20] Tearing down SDDM & Building TTY Autologin..."
 sudo systemctl disable display-manager.service --force 2>/dev/null || true
 sudo systemctl disable sddm.service 2>/dev/null || true
 sudo systemctl disable lightdm.service 2>/dev/null || true
@@ -104,29 +104,28 @@ ExecStart=-/sbin/agetty --autologin $USER_NAME --noclear %I \$TERM
 EOF
 
 mkdir -p ~/.config/fish
-# Menambahkan trigger Hyprland otomatis saat TTY1 login
+# Adding automatic Hyprland trigger upon TTY1 login
 if ! grep -q "Hyprland" ~/.config/fish/config.fish 2>/dev/null; then
     cat << 'EOF' >> ~/.config/fish/config.fish
 
-# Autostart Wayland (Hyprland) via TTY
+# Wayland Autostart (Hyprland) via TTY
 if status is-login
     if test -z "$DISPLAY" -a "$XDG_VTNR" = 1
-        # Menghapus 'exec' agar user memiliki fallback aman (ke terminal) jika Hyprland crash!
+        # Removing 'exec' so user has a safe fallback to terminal if Hyprland crashes!
         Hyprland
     end
 else if status is-interactive
     fastfetch
-end
 end
 EOF
 fi
 
 # 4. Hyprland, Waybar & nwg-dock Config
 echo ""
-echo "[4/20] Menyiapkan Konfigurasi Inti Hyprland, Waybar & Dock..."
+echo "[4/20] Setting up Core Hyprland, Waybar & Dock Configurations..."
 mkdir -p ~/.config/hypr ~/.config/waybar ~/.config/rofi
 
-# Injeksi Waybar Config (Mencegah Blank Workspaces karena default Sway)
+# Inject Waybar Config (Prevent Blank Workspaces due to Sway default)
 [ -f ~/.config/waybar/config ] && cp ~/.config/waybar/config ~/.config/waybar/config.bak || true
 cat << 'EOF' > ~/.config/waybar/config
 {
@@ -144,7 +143,7 @@ cat << 'EOF' > ~/.config/waybar/config
 }
 EOF
 
-# Injeksi Rofi Config (Mencegah GUI jelek)
+# Inject Rofi Config (Prevent ugly GUI)
 [ -f ~/.config/rofi/config.rasi ] && cp ~/.config/rofi/config.rasi ~/.config/rofi/config.rasi.bak || true
 cat << 'EOF' > ~/.config/rofi/config.rasi
 configuration {
@@ -152,28 +151,28 @@ configuration {
     show-icons: true;
     font: "JetBrainsMono Nerd Font 12";
 }
-/* Hapus @theme Arc-Dark karena rawan crash jika tema tidak terinstal */
+/* Removed @theme Arc-Dark due to crash risk if theme is missing */
 EOF
 
 mkdir -p ~/.config/hypr
-# Pembersihan Blok Hyprpaper (Reverted ke Swaybg)
+# Hyprpaper Block Cleaned (Reverted to Swaybg)
 
 [ -f ~/.config/hypr/hyprland.conf ] && cp ~/.config/hypr/hyprland.conf ~/.config/hypr/hyprland.conf.bak || true
 cat << 'EOF' > ~/.config/hypr/hyprland.conf
-# Auto-scale monitor cerdas (mencegah GUI hancur di monitor 4K/HiDPI)
+# Smart monitor auto-scaling (prevents GUI breakage on 4K/HiDPI monitors)
 monitor=,preferred,auto,auto
 
-# Mengunci Ukuran Kursor (Mencegah Bug Kursor Raksasa/Kecil di Wayland)
+# Lock Cursor Size (Prevents Giant/Tiny Cursor Bug in Wayland)
 env = XCURSOR_SIZE,24
 env = XCURSOR_THEME,Adwaita
 
-# Autostart Daemons & Integrasi Portal Wayland
+# Autostart Daemons & Wayland Portal Integration
 exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
-# Menggunakan agen polkit native Hyprland standar 2026
+# Using 2026 standard native Hyprland polkit agent
 exec-once = systemd-cat -t hyprpolkitagent /usr/lib/hyprpolkitagent
 exec-once = swaybg -c "#282a36"
 exec-once = waybar
-# Pemisahan proses background untuk mencegah zombie process di Hyprland
+# Separate background processes to prevent zombie processes in Hyprland
 exec-once = nm-applet --indicator
 exec-once = blueman-applet
 exec-once = nwg-dock-hyprland -d -x -p bottom -l top
@@ -212,7 +211,7 @@ bind = SUPER, Q, killactive,
 bind = SUPER, M, exit, 
 bind = SUPER, V, togglefloating, 
 bind = SUPER, R, exec, rofi -show drun
-# Manajemen Jendela dan Workspace (Sangat Vital)
+# Window and Workspace Management (Vital)
 bind = SUPER, left, movefocus, l
 bind = SUPER, right, movefocus, r
 bind = SUPER, up, movefocus, u
@@ -226,20 +225,20 @@ bind = SUPER SHIFT, 2, movetoworkspace, 2
 bind = SUPER SHIFT, 3, movetoworkspace, 3
 bind = SUPER SHIFT, 4, movetoworkspace, 4
 
-# Media & Brightness Control (Wajib untuk Laptop)
+# Media & Brightness Control (Mandatory for Laptops)
 bindel = , XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
 bindel = , XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
 bindl = , XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
 bindel = , XF86MonBrightnessUp, exec, brightnessctl set 5%+
 bindel = , XF86MonBrightnessDown, exec, brightnessctl set 5%-
 
-# Screenshot (Wajib untuk Wayland)
+# Screenshot (Mandatory for Wayland)
 bind = , Print, exec, grim -g "\$(slurp)" - | wl-copy
 bind = SHIFT, Print, exec, grim - | wl-copy
 EOF
 
 echo ""
-echo "[4.5/20] Menyiapkan Sistem Keamanan Layar & Kustomisasi GTK Wayland..."
+echo "[4.5/20] Setting up Screen Security System & GTK Wayland Customization..."
 # Hypridle Config
 [ -f ~/.config/hypr/hypridle.conf ] && cp ~/.config/hypr/hypridle.conf ~/.config/hypr/hypridle.conf.bak || true
 cat << 'EOF' > ~/.config/hypr/hypridle.conf
@@ -295,7 +294,7 @@ label {
 }
 EOF
 
-# Menyelamatkan Tema GTK dari keburukan default Adwaita
+# Saving GTK Theme from default Adwaita ugliness
 mkdir -p ~/.config/gtk-3.0
 cat << 'EOF' > ~/.config/gtk-3.0/settings.ini
 [Settings]
@@ -306,7 +305,7 @@ gtk-cursor-theme-name=Adwaita
 gtk-application-prefer-dark-theme=1
 EOF
 
-# Menyelamatkan Tema QT dengan Kvantum Arc-Dark
+# Saving QT Theme with Kvantum Arc-Dark
 mkdir -p ~/.config/Kvantum
 cat << 'EOF' > ~/.config/Kvantum/kvantum.kvconfig
 [General]
@@ -315,7 +314,7 @@ EOF
 
 # 5. QTerminal Dracula Purple
 echo ""
-echo "[5/20] Menginjeksi Skema Warna Dracula Purple untuk QTerminal..."
+echo "[5/20] Injecting Dracula Purple Color Scheme for QTerminal..."
 sudo mkdir -p /usr/share/qtermwidget5/color-schemes/ /usr/share/qtermwidget6/color-schemes/
 sudo tee /usr/share/qtermwidget5/color-schemes/DraculaPurple.colorscheme /usr/share/qtermwidget6/color-schemes/DraculaPurple.colorscheme > /dev/null << 'EOF'
 [General]
@@ -367,16 +366,16 @@ fontSize=14
 colorScheme=DraculaPurple
 EOF
 
-# 6. Integrasi Fingerprint (PAM)
+# 6. Fingerprint Integration (PAM)
 echo ""
-echo "[6/20] Mendaftarkan Fingerprint (fprintd) ke modul PAM TTY..."
+echo "[6/20] Registering Fingerprint (fprintd) into TTY PAM module..."
 if [ -f /etc/pam.d/system-local-login ] && ! grep -q "pam_fprintd.so" /etc/pam.d/system-local-login; then
     sudo sed -i '1iauth      sufficient  pam_fprintd.so' /etc/pam.d/system-local-login || true
 fi
 
-# 7. Integrasi Optimasi Firefox
+# 7. Firefox Optimization Integration
 echo ""
-echo "[7/20] Menyuntikkan Tuning Mentok Engine Gecko..."
+echo "[7/20] Injecting Max Tuning for Gecko Engine..."
 killall -9 firefox cachy-browser 2>/dev/null || true
 sleep 0.5
 command -v firefox >/dev/null && firefox --headless -CreateProfile "default" 2>/dev/null || true
@@ -396,9 +395,9 @@ done
 
 # 8. Kernel Sysctl
 echo ""
-echo "[8/20] Kernel Sysctl (Latensi Nol & TCP BBRv3)..."
+echo "[8/20] Kernel Sysctl (Zero Latency & TCP BBRv3)..."
 sudo mkdir -p /etc/sysctl.d
-cat <<EOF | sudo tee /etc/sysctl.d/99-cachyos-godtier.conf
+cat <<EOF | sudo tee /etc/sysctl.d/99-cachyos-optimized.conf
 vm.swappiness=150
 vm.page-cluster=0
 vm.watermark_boost_factor=20000
@@ -411,7 +410,7 @@ sudo sysctl --system || true
 
 # 9. MGLRU & THP
 echo ""
-echo "[9/20] Mengaktifkan MGLRU & THP secara paksa..."
+echo "[9/20] Forcibly Enabling MGLRU & THP..."
 sudo mkdir -p /etc/tmpfiles.d
 cat <<EOF | sudo tee /etc/tmpfiles.d/mglru-thp.conf
 w /sys/kernel/mm/lru_gen/enabled - - - - 1
@@ -420,7 +419,7 @@ EOF
 
 # 10. AUTO-CPUFREQ
 echo ""
-echo "[10/20] AUTO-CPUFREQ: Otak Manajemen Daya Cerdas..."
+echo "[10/20] AUTO-CPUFREQ: Smart Power Management Brain..."
 sudo mkdir -p /etc
 cat <<EOF | sudo tee /etc/auto-cpufreq.conf
 [battery]
@@ -433,25 +432,25 @@ energy_performance_preference = performance
 turbo = auto
 EOF
 
-# 11. Driver iGPU
+# 11. iGPU Driver
 echo ""
-echo "[11/20] Eksekusi Driver iGPU..."
+echo "[11/20] Executing iGPU Driver..."
 sudo mkdir -p /etc/modprobe.d
 if [ "$GPU_VENDOR" = "intel" ]; then
-    cat <<EOF | sudo tee /etc/modprobe.d/gpu-godtier.conf
+    cat <<EOF | sudo tee /etc/modprobe.d/gpu-optimized.conf
 options i915 enable_guc=3 enable_fbc=1 enable_psr=1
 EOF
 elif [ "$GPU_VENDOR" = "amd" ]; then
-    cat <<EOF | sudo tee /etc/modprobe.d/gpu-godtier.conf
+    cat <<EOF | sudo tee /etc/modprobe.d/gpu-optimized.conf
 options amdgpu ppfeaturemask=0xffffffff
 EOF
 fi
 
-# 12. Environment Variables Wayland
+# 12. Wayland Environment Variables
 echo ""
-echo "[12/20] Menyuntikkan Variabel Lingkungan Khusus Wayland..."
+echo "[12/20] Injecting Wayland-Specific Environment Variables..."
 sudo mkdir -p /etc/profile.d
-cat <<EOF | sudo tee /etc/profile.d/wayland-godtier.sh
+cat <<EOF | sudo tee /etc/profile.d/wayland-optimized.sh
 export MESA_NO_ERROR=1
 export MOZ_ENABLE_WAYLAND=1
 export LIBVA_DRIVER_NAME=iHD
@@ -468,37 +467,37 @@ export SDL_VIDEODRIVER="wayland,x11"
 export XDG_SESSION_TYPE=wayland
 EOF
 
-# 13. Optimasi FSTAB
+# 13. FSTAB Optimization
 echo ""
-echo "[13/20] Optimasi FSTAB..."
+echo "[13/20] FSTAB Optimization..."
 if [ -f /etc/fstab ]; then
-    sudo cp /etc/fstab /etc/fstab.godtier.backup || true
+    sudo cp /etc/fstab /etc/fstab.optimized.backup || true
     sudo sed -i 's/relatime/noatime,commit=60/g' /etc/fstab || true
 fi
 
-# 14. UDEV Rules SSD
+# 14. SSD UDEV Rules
 echo ""
-echo "[14/20] UDEV Rules: I/O Scheduler SSD/NVMe -> 'kyber'..."
+echo "[14/20] UDEV Rules: SSD/NVMe I/O Scheduler -> 'kyber'..."
 sudo mkdir -p /etc/udev/rules.d
 cat <<EOF | sudo tee /etc/udev/rules.d/60-ioschedulers.rules
 ACTION=="add|change", KERNEL=="nvme[0-9]*|sd[a-z]*|mmcblk[0-9]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="kyber"
 EOF
 
-# 15. Modul Absolute Shutdown Cleanup
+# 15. Absolute Shutdown Cleanup Module
 echo ""
-echo "[15/20] Membangun Modul Shutdown Cleanup..."
+echo "[15/20] Building Shutdown Cleanup Module..."
 sudo mkdir -p /usr/local/bin
 cat <<'EOF' | sudo tee /usr/local/bin/shutdown-cleanup.sh
 #!/bin/bash
-# Hapus cache pacman (sisakan 2 versi terakhir)
+# Remove pacman cache (keep last 2 versions)
 paccache -r -k2 || true
-# Hapus cache AUR (Yay/Paru) yang menumpuk gila-gilaan
+# Remove AUR (Yay/Paru) cache that piles up insanely
 rm -rf /home/*/.cache/yay/* /home/*/.cache/paru/* 2>/dev/null || true
-# Hapus paket yatim piatu (orphans)
+# Remove orphaned packages
 pacman -Rns $(pacman -Qtdq) --noconfirm 2>/dev/null || true
-# Bersihkan log systemd yang lebih tua dari 3 hari
+# Clean systemd logs older than 3 days
 journalctl --vacuum-time=3d || true
-# Eksekusi TRIM pada SSD
+# Execute TRIM on SSD
 fstrim -av || true
 EOF
 sudo chmod +x /usr/local/bin/shutdown-cleanup.sh
@@ -518,9 +517,9 @@ TimeoutSec=120
 WantedBy=halt.target shutdown.target
 EOF
 
-# 16. Parameter Boot Kritis
+# 16. Critical Boot Parameters
 echo ""
-echo "[16/20] Injeksi Parameter Boot Kritis (mitigations=off)..."
+echo "[16/20] Injecting Critical Boot Parameters (mitigations=off)..."
 if [ "$CPU_VENDOR" = "AuthenticAMD" ]; then
     BOOT_PARAMS="mitigations=off nowatchdog amd_pstate=active quiet"
 else
@@ -548,9 +547,9 @@ elif [ -f /etc/default/grub ]; then
     fi
 fi
 
-# 17. Eksekusi Daemon
+# 17. Daemon Execution
 echo ""
-echo "[17/20] Eksekusi Daemon & Pemusnahan Konflik Daya..."
+echo "[17/20] Executing Daemons & Eliminating Power Conflicts..."
 sudo systemctl daemon-reload
 sudo systemctl disable --now power-profiles-daemon.service tlp.service 2>/dev/null || true
 sudo systemctl mask power-profiles-daemon.service tlp.service 2>/dev/null || true
@@ -574,9 +573,9 @@ else
 fi
 sudo systemctl enable --now scx.service || true
 
-# 18. Membangun Ulang Initramfs
+# 18. Rebuild Initramfs
 echo ""
-echo "[18/20] Membangun Ulang Initramfs (Universal)..."
+echo "[18/20] Rebuilding Initramfs (Universal)..."
 if command -v mkinitcpio &> /dev/null; then
     sudo mkinitcpio -P || true
 fi
@@ -586,8 +585,8 @@ fi
 
 echo ""
 echo "=============================================================================="
-echo "[V] TRANSAKSI KE WAYLAND (HYPRLAND) SELESAI SEMPURNA!"
-echo "SDDM telah dimatikan. Saat Anda reboot, mesin akan login otomatis di TTY1"
-echo "dan langsung menembus ke Hyprland + Waybar + nwg-dock tanpa GUI Login."
-echo "Silakan REBOOT perangkat Anda sekarang."
+echo "[V] TRANSITION TO WAYLAND (HYPRLAND) COMPLETED SUCCESSFULLY!"
+echo "SDDM has been disabled. When you reboot, the machine will auto-login at TTY1"
+echo "and go straight into Hyprland + Waybar + nwg-dock without a GUI Login."
+echo "Please REBOOT your device now."
 echo "=============================================================================="
