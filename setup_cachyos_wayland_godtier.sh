@@ -49,10 +49,12 @@ echo "================================================================="
 # 1. Update & Instalasi Wayland Stack
 echo ""
 echo "[1/20] Instalasi Ekosistem Wayland + Paket Tuning..."
+# Mengamankan PGP Keyring dari kegagalan sinkronisasi fresh install
+sudo pacman -Sy --noconfirm archlinux-keyring cachyos-keyring || true
 sudo pacman -Syu --noconfirm --needed \
     fish hyprland waybar swaybg rofi-wayland mako polkit-kde-agent \
     xdg-desktop-portal-hyprland xdg-desktop-portal-gtk wireplumber \
-    ttf-jetbrains-mono-nerd papirus-icon-theme arc-gtk-theme qterminal fastfetch scx-scheds \
+    ttf-jetbrains-mono-nerd papirus-icon-theme arc-gtk-theme kvantum qterminal fastfetch scx-scheds \
     ananicy-cpp cachyos-ananicy-rules irqbalance auto-cpufreq pacman-contrib \
     network-manager-applet blueman bluez bluez-utils brightnessctl \
     fprintd pavucontrol qt5-wayland qt6-wayland hyprlock hypridle wl-clipboard
@@ -182,6 +184,19 @@ bind = SUPER, Q, killactive,
 bind = SUPER, M, exit, 
 bind = SUPER, V, togglefloating, 
 bind = SUPER, R, exec, rofi -show drun
+# Manajemen Jendela dan Workspace (Sangat Vital)
+bind = SUPER, left, movefocus, l
+bind = SUPER, right, movefocus, r
+bind = SUPER, up, movefocus, u
+bind = SUPER, down, movefocus, d
+bind = SUPER, 1, workspace, 1
+bind = SUPER, 2, workspace, 2
+bind = SUPER, 3, workspace, 3
+bind = SUPER, 4, workspace, 4
+bind = SUPER SHIFT, 1, movetoworkspace, 1
+bind = SUPER SHIFT, 2, movetoworkspace, 2
+bind = SUPER SHIFT, 3, movetoworkspace, 3
+bind = SUPER SHIFT, 4, movetoworkspace, 4
 
 # Media & Brightness Control (Wajib untuk Laptop)
 bindel = , XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
@@ -257,6 +272,13 @@ gtk-icon-theme-name=Papirus-Dark
 gtk-font-name=JetBrainsMono Nerd Font 10
 gtk-cursor-theme-name=Adwaita
 gtk-application-prefer-dark-theme=1
+EOF
+
+# Menyelamatkan Tema QT dengan Kvantum Arc-Dark
+mkdir -p ~/.config/Kvantum
+cat << 'EOF' > ~/.config/Kvantum/kvantum.kvconfig
+[General]
+theme=KvArcDark#
 EOF
 
 # 5. QTerminal Dracula Purple
@@ -401,6 +423,7 @@ export MESA_NO_ERROR=1
 export MOZ_ENABLE_WAYLAND=1
 export QT_QPA_PLATFORM="wayland;xcb"
 export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+export QT_STYLE_OVERRIDE=kvantum
 export GDK_BACKEND="wayland,x11"
 export SDL_VIDEODRIVER="wayland,x11"
 export XDG_SESSION_TYPE=wayland
