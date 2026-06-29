@@ -57,8 +57,8 @@ echo "[1/20] Instalasi Ekosistem Wayland + Paket Tuning..."
 # Mengamankan PGP Keyring dari kegagalan sinkronisasi fresh install
 sudo pacman -Sy --noconfirm archlinux-keyring cachyos-keyring || true
 sudo pacman -Syu --noconfirm --needed \
-    fish hyprland waybar swaybg rofi-wayland mako hyprpolkitagent \
-    xdg-desktop-portal-hyprland xdg-desktop-portal-gtk wireplumber pipewire-pulse \
+    fish hyprland waybar hyprpaper rofi-wayland mako hyprpolkitagent \
+    xdg-desktop-portal-hyprland xdg-desktop-portal-gtk wireplumber pipewire-pulse pipewire-alsa pipewire-jack \
     ttf-jetbrains-mono-nerd ttf-font-awesome papirus-icon-theme arc-gtk-theme kvantum qterminal fastfetch scx-scheds \
     ananicy-cpp cachyos-ananicy-rules irqbalance auto-cpufreq pacman-contrib \
     network-manager-applet blueman bluez bluez-utils brightnessctl \
@@ -113,6 +113,9 @@ if status is-login
         # Menghapus 'exec' agar user memiliki fallback aman (ke terminal) jika Hyprland crash!
         Hyprland
     end
+else if status is-interactive
+    fastfetch
+end
 end
 EOF
 fi
@@ -152,6 +155,12 @@ configuration {
 EOF
 
 mkdir -p ~/.config/hypr
+# Konfigurasi Hyprpaper (Wallpaper)
+cat << 'EOF' > ~/.config/hypr/hyprpaper.conf
+splash = false
+ipc = off
+EOF
+
 [ -f ~/.config/hypr/hyprland.conf ] && cp ~/.config/hypr/hyprland.conf ~/.config/hypr/hyprland.conf.bak || true
 cat << 'EOF' > ~/.config/hypr/hyprland.conf
 # Auto-scale monitor cerdas (mencegah GUI hancur di monitor 4K/HiDPI)
@@ -164,8 +173,8 @@ env = XCURSOR_THEME,Adwaita
 # Autostart Daemons & Integrasi Portal Wayland
 exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 # Menggunakan agen polkit native Hyprland standar 2026
-exec-once = /usr/lib/hyprpolkitagent
-exec-once = swaybg -c "#282a36"
+exec-once = systemd-cat -t hyprpolkitagent /usr/lib/hyprpolkitagent
+exec-once = hyprpaper
 exec-once = waybar
 # Pemisahan proses background untuk mencegah zombie process di Hyprland
 exec-once = nm-applet --indicator
@@ -528,6 +537,11 @@ if bootctl is-installed &>/dev/null; then
         fi
     done
     shopt -u nullglob
+elif [ -f /etc/kernel/cmdline ]; then
+    if ! grep -q "mitigations=off" /etc/kernel/cmdline; then
+        sudo sed -i "s/$/ $BOOT_PARAMS/" /etc/kernel/cmdline
+        sudo sdboot-manage gen || sudo bootctl update || true
+    fi
 elif [ -f /etc/default/grub ]; then
     if ! grep -q "mitigations=off" /etc/default/grub; then
         sudo sed -i "s/^\(GRUB_CMDLINE_LINUX_DEFAULT=[\"']\)/\1$BOOT_PARAMS /" /etc/default/grub
