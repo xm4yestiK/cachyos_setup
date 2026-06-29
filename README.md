@@ -1,63 +1,63 @@
-# CachyOS Wayland God-Tier Setup (Hyprland Edition)
+# CachyOS Wayland Setup (Hyprland Edition)
 
-Script instalasi, personalisasi, dan optimasi komprehensif untuk OS CachyOS. Dirancang khusus bagi Anda yang ingin mencapai puncak performa (*absolute peak performance*) dengan meninggalkan protokol X11 yang usang dan beralih penuh ke ekosistem **Wayland Murni (Hyprland)**.
+A comprehensive installation, personalization, and optimization script for CachyOS. Designed specifically for users who want to achieve absolute peak performance by completely abandoning the legacy X11 protocol and transitioning to a **Pure Wayland Ecosystem (Hyprland)**.
 
-## Fitur Unggulan (Wayland God-Tier)
+## Key Features
 
-Script ini dirancang untuk menciptakan keseimbangan absolut antara performa latensi-nol, estetika premium, dan keamanan baterai laptop:
+This script is engineered to create the absolute balance between zero-latency performance, premium aesthetics, and laptop battery life:
 
-1. **Hyprland Murni & TTY Autologin (Zero RAM Login)**
-   - Display Manager berat (seperti SDDM atau GDM) **dimatikan secara permanen**.
-   - Laptop akan masuk secara otomatis (Autologin) via TTY hitam, dan langsung ditembak ke dalam sesi Hyprland menggunakan injeksi *Fish Shell*. Ini menghemat hingga 100MB RAM.
+1. **Pure Hyprland & TTY Autologin (Zero RAM Login)**
+   - Heavy Display Managers (like SDDM or GDM) are **permanently disabled**.
+   - The laptop will automatically log in via a black TTY and instantly drop into a Hyprland session using a *Fish Shell* injection. This saves up to 100MB of RAM.
 
-2. **Panel & Dock Modern (Tanpa Kompositor Tambahan)**
-   - Menggunakan **Waybar** (panel cerdas pendeteksi WiFi/Baterai) dan **nwg-dock-hyprland** sebagai navigasi utama.
-   - Skrip ini otomatis menambal *bug* "Blank Workspace" bawaan Waybar untuk memastikan Waybar dan Hyprland berkomunikasi sempurna.
+2. **Modern Panel & Dock (No Extra Compositors)**
+   - Utilizes **Waybar** (smart panel with WiFi/Battery detection) and **nwg-dock-hyprland** as the primary navigation.
+   - The script automatically patches Waybar's built-in "Blank Workspace" bug to ensure perfect communication between Waybar and Hyprland.
 
-3. **Hybrid Smart Power & Idle Security (Perlindungan Baterai)**
-   - Diatur otomatis oleh `auto-cpufreq` (Turbo Auto saat di-*charge*, Powersave tanpa turbo saat pakai baterai).
-   - Layar otomatis redup saat ditinggalkan, dan sistem akan mengunci (*lock*) secara agresif dengan **Hyprlock** & **Hypridle** sebelum laptop masuk ke mode tidur (suspend), mencegah kebocoran keamanan privasi saat di tempat umum.
+3. **Hybrid Smart Power & Idle Security (Battery Protection)**
+   - Automatically managed by `auto-cpufreq` (Turbo Auto when plugged in, Powersave without turbo on battery).
+   - The screen automatically dims when left idle, and the system locks aggressively with **Hyprlock** & **Hypridle** before suspending, preventing privacy leaks in public spaces.
 
-4. **Integrasi Media & Wayland Portals (Anti-Freeze)**
-   - Semua tombol *Media Keys* laptop (Brightness, Volume, Mute) dihidupkan paksa melalui *keybinds* Hyprland.
-   - Menginjeksi **XDG Desktop Portals** dan daemon **DBus**. Dijamin tidak akan ada aplikasi Flatpak atau *Screen Sharing* (Discord/OBS) yang mogok atau layar nge- *freeze*.
+4. **Media Integration & Wayland Portals (Anti-Freeze)**
+   - All laptop *Media Keys* (Brightness, Volume, Mute) are forcibly bound through Hyprland keybinds.
+   - Injects **XDG Desktop Portals** and the **DBus** daemon. Guarantees no Flatpak apps or screen sharing (Discord/OBS) will crash or freeze your screen.
 
-5. **Proteksi UI (Keindahan yang Konsisten)**
-   - Memaksa variabel khusus agar aplikasi Qt (seperti QTerminal) tidak menggambar bingkai ganda (*Double Titlebar Bug*).
-   - Menyuntikkan tema standar `Arc-Dark` dan *icon* `Papirus` ke modul GTK, memastikan tidak ada aplikasi (seperti Pengaturan Suara) yang mundur ke tema putih Adwaita lawas.
-   - Memperbaiki memori "Copy-Paste" (Clipboard) di Wayland menggunakan `wl-clipboard` agar teks tidak hilang saat aplikasi ditutup.
+5. **UI Protection (Consistent Aesthetics)**
+   - Forces specific variables so Qt applications (like QTerminal) do not draw double borders (*Double Titlebar Bug*).
+   - Injects the standard `Arc-Dark` theme and `Papirus` icons into GTK modules, ensuring no apps (like Audio Settings) revert to the legacy white Adwaita theme.
+   - Fixes Wayland's clipboard using `wl-clipboard` and `cliphist` so copied text is never lost when an application closes.
 
-6. **Tuning Kernel & Gecko Engine Terpusat**
-   - TCP BBRv3, *Transparent Huge Pages* (THP), *MGLRU*, I/O Scheduler SSD `kyber`, hingga latensi memori agresif.
-   - Injeksi 25+ parameter kustom ke profil Firefox / Cachy-Browser bahkan jika browser belum pernah dibuka sama sekali (*headless generation*).
+6. **Centralized Kernel & Gecko Engine Tuning**
+   - Implements TCP BBRv3, *Transparent Huge Pages* (THP), *MGLRU*, `kyber` SSD I/O Scheduler, and aggressive memory latency tuning.
+   - Injects 25+ custom parameters into the Firefox / Cachy-Browser profile even if the browser has never been opened (*headless generation*).
 
-7. **Pembersih Sampah Otomatis (Absolute Shutdown Cleanup)**
-   - Sebuah modul systemd khusus berjalan setiap kali Anda mematikan laptop, memastikan *cache* pacman, yatim piatu (*orphans*), dan jurnal lawas terhapus secara otomatis, diakhiri dengan *fstrim*.
+7. **Automated Garbage Collector (Absolute Shutdown Cleanup)**
+   - A custom systemd module runs every time you shut down the laptop, ensuring pacman cache, orphaned packages, and old journals are automatically deleted, concluding with an *fstrim*.
 
-## Peringatan Keras
+## Strict Warnings
 
-- **Root-Blocker:** JANGAN PERNAH menjalankan skrip ini menggunakan `sudo bash`. Skrip ini memiliki sensor pendeteksi root dan akan mati otomatis. Skrip dirancang untuk dijalankan sebagai *user* biasa (akan meminta password `sudo` secara elegan di dalam terminal).
-- Skrip ini diperuntukkan untuk **Fresh Install** CachyOS (atau sistem yang masih relatif baru) demi menghindari bentrokan konfigurasi ekstensif. Sistem auto-backup bawaan skrip ini (`.bak`) akan berusaha menyelamatkan konfigurasi lama Anda jika ditemukan.
+- **Root-Blocker:** NEVER run this script using `sudo bash`. This script has a built-in root detector and will self-terminate. It is designed to be run as a standard *user* (it will elegantly request your `sudo` password within the terminal).
+- This script is intended for a **Fresh Install** of CachyOS (or a relatively new system) to avoid extensive configuration conflicts. The script's built-in auto-backup system (`.bak`) will attempt to save your old configurations if found.
 
-## Panduan Instalasi OS (Calamares)
+## OS Installation Guide (Calamares)
 
-Agar skrip ini bekerja dengan tingkat kebersihan (bloat-free) paling maksimal, harap ikuti instruksi berikut saat Anda sedang menginstal CachyOS dari Flashdisk (Installer Calamares):
+To ensure this script works with maximum cleanliness (bloat-free), please follow these instructions when installing CachyOS from a USB drive (Calamares Installer):
 
-1. **Jalur Dewa (Direkomendasikan):** 
-   Pilih opsi **"No Desktop Environment"**, **"Minimal/CLI"**, atau **"Base System Only"** (jika tersedia). Ini akan menginstal sistem murni tanpa antarmuka grafis. Skrip ini nantinya yang akan membangun antarmuka Hyprland dari nol.
-2. **Jalur Standar (Alternatif):**
-   Jika installer mewajibkan Anda memilih Desktop Environment, pilihlah **Hyprland** atau **Sway**. Skrip ini akan menimpa konfigurasinya menjadi versi *God-Tier* dan membunuh SDDM bawaannya.
-3. **Peringatan Mutlak:**
-   **JANGAN PERNAH** memilih LXQt, KDE Plasma (X11), XFCE, atau Openbox. Memilihnya berarti mengotori sistem Anda dengan paket usang (`xorg-server`) yang pada akhirnya hanya akan dimatikan secara paksa oleh skrip ini.
+1. **The Ultimate Path (Recommended):** 
+   Select the **"No Desktop Environment"**, **"Minimal/CLI"**, or **"Base System Only"** option (if available). This installs a pure system without a graphical interface. This script will build the Hyprland interface from scratch.
+2. **The Standard Path (Alternative):**
+   If the installer forces you to select a Desktop Environment, choose **Hyprland** or **Sway**. This script will overwrite its configurations to a premium version and kill its default SDDM.
+3. **Absolute Warning:**
+   **NEVER** select LXQt, KDE Plasma (X11), XFCE, or Openbox. Choosing them means polluting your system with legacy packages (`xorg-server`) which will ultimately be forcefully disabled by this script.
 
-## Panduan Eksekusi
+## Execution Guide
 
-Jalankan perintah berikut di dalam terminal Anda:
+Run the following commands in your terminal:
 
 ```bash
 cd ~/Scripts/CACHYOS_SETUP
-chmod +x setup_cachyos_wayland_godtier.sh
-./setup_cachyos_wayland_godtier.sh
+chmod +x setup_cachyos_wayland.sh
+./setup_cachyos_wayland.sh
 ```
 
-Setelah log terminal menyatakan instalasi berhasil (Tahap 20), silakan *Reboot* mesin Anda. Jangan panik jika Anda tidak melihat layar SDDM. Terminal TTY akan berkedip singkat, dan membawa Anda langsung ke Desktop Wayland masa depan.
+After the terminal log states the installation is successful (Stage 20), please *Reboot* your machine. Do not panic if you don't see the SDDM screen. The TTY terminal will flash briefly and take you straight into the Wayland Desktop of the future.
