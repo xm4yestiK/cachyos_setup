@@ -3,6 +3,11 @@
 # ========================================================================
 # Script Personalisasi & Optimasi "WAYLAND GOD-TIER" (HYPRLAND)
 # Dibuat khusus: OS CachyOS x86_64 | DYNAMIC AUTO-DETECT (INTEL & AMD)
+#
+# PANDUAN INSTALASI CACHYOS (Calamares):
+# 1. Pilih opsi "No Desktop Environment" (CLI) jika tersedia.
+# 2. Jika wajib memilih DE, pilih "Hyprland" atau "Sway".
+# 3. JANGAN PERNAH memilih LXQt, XFCE, atau Openbox (X11 Bloat).
 # 
 # [FITUR UTAMA SCRIPT INI]:
 # - Migrasi total dari X11 (Openbox) ke WAYLAND murni (Hyprland).

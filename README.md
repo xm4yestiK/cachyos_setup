@@ -39,6 +39,17 @@ Script ini dirancang untuk menciptakan keseimbangan absolut antara performa late
 - **Root-Blocker:** JANGAN PERNAH menjalankan skrip ini menggunakan `sudo bash`. Skrip ini memiliki sensor pendeteksi root dan akan mati otomatis. Skrip dirancang untuk dijalankan sebagai *user* biasa (akan meminta password `sudo` secara elegan di dalam terminal).
 - Skrip ini diperuntukkan untuk **Fresh Install** CachyOS (atau sistem yang masih relatif baru) demi menghindari bentrokan konfigurasi ekstensif. Sistem auto-backup bawaan skrip ini (`.bak`) akan berusaha menyelamatkan konfigurasi lama Anda jika ditemukan.
 
+## Panduan Instalasi OS (Calamares)
+
+Agar skrip ini bekerja dengan tingkat kebersihan (bloat-free) paling maksimal, harap ikuti instruksi berikut saat Anda sedang menginstal CachyOS dari Flashdisk (Installer Calamares):
+
+1. **Jalur Dewa (Direkomendasikan):** 
+   Pilih opsi **"No Desktop Environment"**, **"Minimal/CLI"**, atau **"Base System Only"** (jika tersedia). Ini akan menginstal sistem murni tanpa antarmuka grafis. Skrip ini nantinya yang akan membangun antarmuka Hyprland dari nol.
+2. **Jalur Standar (Alternatif):**
+   Jika installer mewajibkan Anda memilih Desktop Environment, pilihlah **Hyprland** atau **Sway**. Skrip ini akan menimpa konfigurasinya menjadi versi *God-Tier* dan membunuh SDDM bawaannya.
+3. **Peringatan Mutlak:**
+   **JANGAN PERNAH** memilih LXQt, KDE Plasma (X11), XFCE, atau Openbox. Memilihnya berarti mengotori sistem Anda dengan paket usang (`xorg-server`) yang pada akhirnya hanya akan dimatikan secara paksa oleh skrip ini.
+
 ## Panduan Eksekusi
 
 Jalankan perintah berikut di dalam terminal Anda:
