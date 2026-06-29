@@ -1,4 +1,4 @@
-# CachyOS Wayland Setup (Hyprland Edition)
+# CachyOS Wayland Setup (Hyprland Edition) - by m4yestiK
 
 A comprehensive installation, personalization, and optimization script for CachyOS. Designed specifically for users who want to achieve absolute peak performance by completely abandoning the legacy X11 protocol and transitioning to a **Pure Wayland Ecosystem (Hyprland)**.
 
