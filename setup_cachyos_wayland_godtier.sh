@@ -57,12 +57,12 @@ echo "[1/20] Instalasi Ekosistem Wayland + Paket Tuning..."
 # Mengamankan PGP Keyring dari kegagalan sinkronisasi fresh install
 sudo pacman -Sy --noconfirm archlinux-keyring cachyos-keyring || true
 sudo pacman -Syu --noconfirm --needed \
-    fish hyprland waybar swaybg rofi-wayland mako polkit-kde-agent \
+    fish hyprland waybar swaybg rofi-wayland mako hyprpolkitagent \
     xdg-desktop-portal-hyprland xdg-desktop-portal-gtk wireplumber pipewire-pulse \
     ttf-jetbrains-mono-nerd ttf-font-awesome papirus-icon-theme arc-gtk-theme kvantum qterminal fastfetch scx-scheds \
     ananicy-cpp cachyos-ananicy-rules irqbalance auto-cpufreq pacman-contrib \
     network-manager-applet blueman bluez bluez-utils brightnessctl \
-    fprintd pavucontrol qt5-wayland qt6-wayland hyprlock hypridle wl-clipboard grim slurp xdg-user-dirs
+    fprintd pavucontrol qt5-wayland qt6-wayland hyprlock hypridle wl-clipboard cliphist grim slurp xdg-user-dirs
 
 # Mengamankan Struktur Direktori dan Font Cache
 xdg-user-dirs-update || true
@@ -160,8 +160,8 @@ env = XCURSOR_THEME,Adwaita
 
 # Autostart Daemons & Integrasi Portal Wayland
 exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
-# Jeda 1 detik pada polkit untuk mencegah Race Condition GUI Password
-exec-once = sleep 1 && /usr/lib/polkit-kde-authentication-agent-1
+# Menggunakan agen polkit native Hyprland standar 2026
+exec-once = systemctl --user start hyprpolkitagent
 exec-once = swaybg -c "#282a36"
 exec-once = waybar
 # Pemisahan proses background untuk mencegah zombie process di Hyprland
@@ -169,7 +169,8 @@ exec-once = nm-applet --indicator
 exec-once = blueman-applet
 exec-once = nwg-dock-hyprland -d -x -p bottom -l top
 exec-once = hypridle
-exec-once = wl-paste --type text --watch wl-copy
+exec-once = wl-paste --type text --watch cliphist store
+exec-once = wl-paste --type image --watch cliphist store
 
 input {
     kb_layout = us
