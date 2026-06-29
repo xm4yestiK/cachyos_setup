@@ -54,7 +54,7 @@ sudo pacman -Sy --noconfirm archlinux-keyring cachyos-keyring || true
 sudo pacman -Syu --noconfirm --needed \
     fish hyprland waybar swaybg rofi-wayland mako polkit-kde-agent \
     xdg-desktop-portal-hyprland xdg-desktop-portal-gtk wireplumber pipewire-pulse \
-    ttf-jetbrains-mono-nerd papirus-icon-theme arc-gtk-theme kvantum qterminal fastfetch scx-scheds \
+    ttf-jetbrains-mono-nerd ttf-font-awesome papirus-icon-theme arc-gtk-theme kvantum qterminal fastfetch scx-scheds \
     ananicy-cpp cachyos-ananicy-rules irqbalance auto-cpufreq pacman-contrib \
     network-manager-applet blueman bluez bluez-utils brightnessctl \
     fprintd pavucontrol qt5-wayland qt6-wayland hyprlock hypridle wl-clipboard grim slurp xdg-user-dirs
@@ -85,6 +85,7 @@ sudo localectl set-locale LANG=id_ID.UTF-8 || true
 # 3. TTY Autologin (Membunuh SDDM)
 echo ""
 echo "[3/20] Meruntuhkan SDDM & Membangun TTY Autologin..."
+sudo systemctl disable display-manager.service --force 2>/dev/null || true
 sudo systemctl disable sddm.service 2>/dev/null || true
 sudo systemctl disable lightdm.service 2>/dev/null || true
 sudo systemctl disable gdm.service 2>/dev/null || true
@@ -147,6 +148,10 @@ mkdir -p ~/.config/hypr
 cat << 'EOF' > ~/.config/hypr/hyprland.conf
 # Auto-scale monitor cerdas (mencegah GUI hancur di monitor 4K/HiDPI)
 monitor=,preferred,auto,auto
+
+# Mengunci Ukuran Kursor (Mencegah Bug Kursor Raksasa/Kecil di Wayland)
+env = XCURSOR_SIZE,24
+env = XCURSOR_THEME,Adwaita
 
 # Autostart Daemons & Integrasi Portal Wayland
 exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
@@ -436,6 +441,9 @@ export MOZ_ENABLE_WAYLAND=1
 export QT_QPA_PLATFORM="wayland;xcb"
 export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 export QT_STYLE_OVERRIDE=kvantum
+export QT_QPA_PLATFORMTHEME=kvantum
+export XCURSOR_SIZE=24
+export XCURSOR_THEME=Adwaita
 export GDK_BACKEND="wayland,x11"
 export SDL_VIDEODRIVER="wayland,x11"
 export XDG_SESSION_TYPE=wayland
